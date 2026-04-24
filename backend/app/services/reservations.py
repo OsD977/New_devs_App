@@ -73,7 +73,10 @@ async def calculate_total_revenue(property_id: str, tenant_id: str) -> Dict[str,
                 row = result.fetchone()
                 
                 if row:
-                    total_revenue = Decimal(str(row.total_revenue))
+                    # in DB: total_amount NUMERIC(10, 3) NOT NULL, we save 3 decimal places
+                    total_revenue = Decimal(str(row.total_revenue)).quantize(
+                        Decimal('0.01'), rounding=ROUND_HALF_UP
+                    )
                     return {
                         "property_id": property_id,
                         "tenant_id": tenant_id,
